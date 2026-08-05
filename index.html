@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabela de Medidas & Gradação | David Carvalho Modelista</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#FF7A00',
+              'orange-hover': '#E56D00',
+              black: '#1E1E24',
+              surface: '#EAEBED',
+              card: '#F8F9FA'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- html2pdf.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Estilos Neomórficos e Background Gradient -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="neo-bg text-slate-800 min-h-screen flex flex-col font-sans selection:bg-brand-orange selection:text-white">
+
+  <!-- Cabeçalho Principal estilo Neomorfismo suave -->
+  <header class="neo-card-sm border-b border-white/60 sticky top-0 z-50 no-print">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="neo-orange-btn text-white w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xl">
+          <i class="fa-solid fa-ruler-combined"></i>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-lg leading-tight tracking-wide text-brand-black">Gradua<span class="text-brand-orange">Pro</span></h1>
+          <p class="text-xs text-slate-500 font-medium">Gerador de Tabela de Medidas</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="text-xs font-semibold px-3.5 py-1.5 rounded-full neo-badge text-slate-700">
+          Desenvolvido por <strong class="text-brand-black">David Carvalho Modelista</strong>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-5xl w-full mx-auto p-4 md:p-8 space-y-8">
+
+    <!-- Step 0: Captura de Lead -->
+    <section id="leadSection" class="neo-card p-6 md:p-10 rounded-3xl relative overflow-hidden">
+      <div class="max-w-2xl mx-auto text-center space-y-4 mb-8">
+        <span class="inline-block px-4 py-1.5 neo-orange-tag text-brand-orange text-xs font-bold uppercase tracking-wider rounded-full">
+          Acesso Gratuito
+        </span>
+        <h2 class="text-2xl md:text-3xl font-extrabold text-brand-black">Monte e Gradue sua Tabela de Medidas em Segundos</h2>
+        <p class="text-slate-500 text-sm">Preencha seus dados abaixo para liberar a calculadora de gradação automática. É 100% gratuito!</p>
+      </div>
+
+      <form id="leadForm" class="max-w-xl mx-auto space-y-5">
+        <div>
+          <label class="block text-xs uppercase tracking-wider font-bold text-slate-600 mb-1.5">Seu Nome *</label>
+          <input type="text" id="leadName" required placeholder="Ex: Ana Maria" class="neo-input w-full px-4 py-3.5 text-brand-black placeholder-slate-400 focus:outline-none transition">
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-xs uppercase tracking-wider font-bold text-slate-600 mb-1.5">WhatsApp / Telefone *</label>
+            <input type="tel" id="leadPhone" required placeholder="(00) 00000-0000" class="neo-input w-full px-4 py-3.5 text-brand-black placeholder-slate-400 focus:outline-none transition">
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider font-bold text-slate-600 mb-1.5">E-mail *</label>
+            <input type="email" id="leadEmail" required placeholder="seu@email.com" class="neo-input w-full px-4 py-3.5 text-brand-black placeholder-slate-400 focus:outline-none transition">
+          </div>
+        </div>
+        <button type="submit" class="w-full neo-btn-primary text-white font-bold py-4 rounded-2xl transition transform active:scale-95 flex items-center justify-center gap-2">
+          Liberar Calculadora <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+    </section>
+
+    <!-- Área da Aplicação (Oculta até o preenchimento do lead) -->
+    <div id="appSection" class="hidden space-y-8 no-print">
+
+      <!-- 1. Dados do Modelo & Tamanhos -->
+      <section class="neo-card p-6 md:p-8 rounded-3xl space-y-6">
+        <div class="flex items-center space-x-3 border-b border-slate-200/60 pb-4">
+          <span class="neo-orange-btn text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center">1</span>
+          <h2 class="text-xl font-bold text-brand-black">Identificação & Tamanhos</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Nome / Referência -->
+          <div class="md:col-span-1">
+            <label class="block text-xs uppercase tracking-wider font-bold text-slate-600 mb-2">Modelo / Referência *</label>
+            <input type="text" id="modelRef" placeholder="Ex: Ref_001" class="neo-input w-full px-4 py-3 text-brand-black placeholder-slate-400 focus:outline-none transition">
+          </div>
+
+          <!-- Gerenciador de Tamanhos -->
+          <div class="md:col-span-2 space-y-2">
+            <label class="block text-xs uppercase tracking-wider font-bold text-slate-600 mb-1">Tamanhos da Tabela</label>
+            
+            <div class="flex flex-wrap gap-2.5 items-center mb-3" id="sizeBadgesContainer">
+              <!-- Renderizado via JS -->
+            </div>
+
+            <!-- Adicionar Novo Tamanho -->
+            <div class="flex gap-2">
+              <input type="text" id="newSizeInput" placeholder="Adicionar tamanho (ex: GGG, 42)" class="neo-input px-4 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none flex-grow">
+              <button type="button" id="addSizeBtn" class="neo-btn-dark text-white font-medium px-4 py-2 rounded-xl text-sm transition">
+                <i class="fa-solid fa-plus mr-1"></i> Adicionar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seleção do Tamanho Base -->
+        <div class="pt-4 border-t border-slate-200/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <label class="block text-sm font-bold text-brand-black">Qual é o seu Tamanho Base (Piloto)?</label>
+            <p class="text-xs text-slate-500">Os aumentos e diminuições serão calculados a partir deste tamanho.</p>
+          </div>
+          <select id="baseSizeSelect" class="neo-input text-brand-orange font-bold rounded-xl px-4 py-2.5 focus:outline-none min-w-[150px]">
+            <!-- Preenchido via JS -->
+          </select>
+        </div>
+      </section>
+
+      <!-- 2. Medidas Base & Aumento/Diminuição -->
+      <section class="neo-card p-6 md:p-8 rounded-3xl space-y-6">
+        <div class="flex justify-between items-center border-b border-slate-200/60 pb-4">
+          <div class="flex items-center space-x-3">
+            <span class="neo-orange-btn text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center">2</span>
+            <h2 class="text-xl font-bold text-brand-black">Medidas e Salto de Gradação</h2>
+          </div>
+          <button type="button" id="addMeasureBtn" class="neo-btn-secondary text-brand-orange font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i> Nova Medida
+          </button>
+        </div>
+
+        <!-- Lista Dinâmica de Medidas -->
+        <div id="measuresContainer" class="space-y-3.5">
+          <!-- Linhas de medida via JS -->
+        </div>
+      </section>
+
+      <!-- Botão Calcular -->
+      <div class="text-center">
+        <button id="calculateBtn" class="neo-btn-primary text-white font-bold text-lg px-10 py-4 rounded-2xl transition transform active:scale-95">
+          <i class="fa-solid fa-calculator mr-2"></i> Calcular e Gerar Tabela
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. Resultado / Tabela Final -->
+    <section id="resultSection" class="hidden space-y-6">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 no-print">
+        <div>
+          <h2 class="text-2xl font-bold text-brand-black">Tabela Graduada Pronta</h2>
+          <p class="text-slate-500 text-sm">Confira os valores gerados abaixo. Você pode imprimir ou exportar para PDF.</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <!-- NOVO BOTÃO: Gerar Nova Tabela sem recadastrar lead -->
+          <button id="newTableBtn" class="neo-btn-secondary text-slate-700 font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 text-sm">
+            <i class="fa-solid fa-rotate-left text-brand-orange"></i> Nova Tabela
+          </button>
+          
+          <button id="printBtn" class="neo-card-sm text-brand-black font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-2 text-sm">
+            <i class="fa-solid fa-print"></i> Imprimir
+          </button>
+          
+          <button id="pdfBtn" class="neo-btn-primary text-white font-bold px-5 py-2.5 rounded-xl transition flex items-center gap-2 text-sm">
+            <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Container da Ficha de Medidas (Estilo Neomorfismo Claro para Garantir Renderização do PDF) -->
+      <div id="pdfExportContainer" class="neo-card p-6 md:p-10 rounded-3xl">
+        
+        <!-- Header da Ficha -->
+        <div class="border-b border-slate-200 pb-6 mb-6 flex justify-between items-end">
+          <div>
+            <span class="text-xs uppercase font-bold text-brand-orange tracking-widest block mb-1">Ficha de Gradação de Medidas</span>
+            <h3 id="pdfModelRef" class="text-2xl font-extrabold text-brand-black">--</h3>
+          </div>
+          <div class="text-right text-xs text-slate-500">
+            <p>Data: <span id="pdfDate" class="text-slate-800 font-medium"></span></p>
+            <p class="mt-1 font-semibold text-brand-black">Modelagem: David Carvalho Modelista</p>
+          </div>
+        </div>
+
+        <!-- Tabela -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr id="tableHeader" class="border-b-2 border-slate-800 text-slate-700 text-xs uppercase tracking-wider bg-slate-100/50"></tr>
+            </thead>
+            <tbody id="tableBody" class="divide-y divide-slate-200/80 text-slate-800"></tbody>
+          </table>
+        </div>
+
+        <!-- Rodapé do PDF -->
+        <div class="mt-8 pt-4 border-t border-slate-200/80 text-center text-xs text-slate-400">
+          <p>Tabela de medidas gerada via GraduaPro - David Carvalho Modelista & Risco Computadorizado</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Rodapé Institucional -->
+  <footer class="border-t border-white/50 py-6 text-center text-xs text-slate-500 no-print mt-auto">
+    <div class="max-w-5xl mx-auto px-4 space-y-1">
+      <p>Desenvolvido para profissionais da confecção e vestuário.</p>
+      <p class="text-slate-700 font-semibold">© David Carvalho - Modelagem e Risco Computadorizado</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

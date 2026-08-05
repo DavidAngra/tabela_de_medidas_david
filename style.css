@@ -1,0 +1,99 @@
+/* Fundo da Tela: Degradê Diagonal entre #C3C1C2 e #C3B6AE */
+.neo-bg {
+  background: linear-gradient(135deg, #C3C1C2 0%, #C3B6AE 100%);
+  background-attachment: fixed;
+}
+
+/* Cartões Principais: Cor #D4D4D4 com Sombra Projetada Limpa (Sem Blur Branco) */
+.neo-card {
+  background-color: #D4D4D4;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Cartões Menores e Elementos em Destaque */
+.neo-card-sm {
+  background-color: #D4D4D4;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Campos de Entrada (Inputs Mais Claros e Agradáveis) */
+.neo-input {
+  background-color: #F2F2F4;
+  color: #1E1E24;
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1), 
+    inset -1px -1px 3px rgba(255, 255, 255, 0.8);
+  border: 1px solid #D1D1D6;
+  border-radius: 12px;
+}
+
+.neo-input:focus {
+  background-color: #FFFFFF;
+  border-color: #FF7A00;
+  box-shadow: 
+    0 0 0 3px rgba(255, 122, 0, 0.15),
+    inset 2px 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Botões Principais Laranja com Sombra Limpa */
+.neo-btn-primary {
+  background: linear-gradient(145deg, #FF851A, #E56D00);
+  box-shadow: 0 8px 20px rgba(229, 109, 0, 0.35);
+}
+
+.neo-btn-primary:hover {
+  background: linear-gradient(145deg, #FF912E, #EF7300);
+  box-shadow: 0 10px 24px rgba(229, 109, 0, 0.45);
+}
+
+.neo-orange-btn {
+  background: linear-gradient(145deg, #FF851A, #E56D00);
+  box-shadow: 0 4px 10px rgba(229, 109, 0, 0.3);
+}
+
+.neo-btn-secondary {
+  background-color: #EFEFEF;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 122, 0, 0.3);
+}
+
+.neo-btn-dark {
+  background-color: #2B2C34;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.neo-badge {
+  background-color: #EFEFEF;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.neo-orange-tag {
+  background-color: #FBEFE8;
+  box-shadow: inset 1px 1px 3px rgba(255, 122, 0, 0.1);
+}
+
+/* Regras de Impressão e PDF */
+@media print {
+  body { 
+    background: #ffffff !important; 
+    color: #000000 !important; 
+  }
+  
+  .no-print { 
+    display: none !important; 
+  }
+  
+  #pdfExportContainer { 
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  th, td { 
+    border-color: #cbd5e1 !important; 
+    color: #000000 !important; 
+  }
+}
