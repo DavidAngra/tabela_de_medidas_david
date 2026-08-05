@@ -35,7 +35,7 @@
 </head>
 <body class="neo-bg text-slate-800 min-h-screen flex flex-col font-sans selection:bg-brand-orange selection:text-white">
 
-  <!-- Cabeçalho Principal estilo Neomorfismo suave -->
+  <!-- Cabeçalho Principal -->
   <header class="neo-card-sm border-b border-white/60 sticky top-0 z-50 no-print">
     <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
       <div class="flex items-center space-x-3">
@@ -88,12 +88,12 @@
       </form>
     </section>
 
-    <!-- Área da Aplicação (Oculta até o preenchimento do lead) -->
+    <!-- Área da Aplicação -->
     <div id="appSection" class="hidden space-y-8 no-print">
 
       <!-- 1. Dados do Modelo & Tamanhos -->
       <section class="neo-card p-6 md:p-8 rounded-3xl space-y-6">
-        <div class="flex items-center space-x-3 border-b border-slate-200/60 pb-4">
+        <div class="flex items-center space-x-3 border-b border-slate-300/60 pb-4">
           <span class="neo-orange-btn text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center">1</span>
           <h2 class="text-xl font-bold text-brand-black">Identificação & Tamanhos</h2>
         </div>
@@ -102,7 +102,7 @@
           <!-- Nome / Referência -->
           <div class="md:col-span-1">
             <label class="block text-xs uppercase tracking-wider font-bold text-slate-600 mb-2">Modelo / Referência *</label>
-            <input type="text" id="modelRef" placeholder="Ex: Ref_001" class="neo-input w-full px-4 py-3 text-brand-black placeholder-slate-400 focus:outline-none transition">
+            <input type="text" id="modelRef" placeholder="Ex: Scrub Pollo" class="neo-input w-full px-4 py-3 text-brand-black placeholder-slate-400 focus:outline-none transition">
           </div>
 
           <!-- Gerenciador de Tamanhos -->
@@ -124,7 +124,7 @@
         </div>
 
         <!-- Seleção do Tamanho Base -->
-        <div class="pt-4 border-t border-slate-200/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="pt-4 border-t border-slate-300/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <label class="block text-sm font-bold text-brand-black">Qual é o seu Tamanho Base (Piloto)?</label>
             <p class="text-xs text-slate-500">Os aumentos e diminuições serão calculados a partir deste tamanho.</p>
@@ -136,8 +136,8 @@
       </section>
 
       <!-- 2. Medidas Base & Aumento/Diminuição -->
-      <section class="neo-card p-6 md:p-8 rounded-3xl space-y-6">
-        <div class="flex justify-between items-center border-b border-slate-200/60 pb-4">
+      <section class="neo-card p-6 md:p-8 rounded-3xl space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-300/60 pb-4">
           <div class="flex items-center space-x-3">
             <span class="neo-orange-btn text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center">2</span>
             <h2 class="text-xl font-bold text-brand-black">Medidas e Salto de Gradação</h2>
@@ -145,6 +145,14 @@
           <button type="button" id="addMeasureBtn" class="neo-btn-secondary text-brand-orange font-bold px-4 py-2 rounded-xl text-sm transition flex items-center gap-2">
             <i class="fa-solid fa-plus"></i> Nova Medida
           </button>
+        </div>
+
+        <!-- Legenda Fixa das Colunas (Desktop) -->
+        <div class="hidden md:grid grid-cols-12 gap-3 px-3 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+          <div class="col-span-5">Descrição da Medida</div>
+          <div class="col-span-3">Medida Base (cm)</div>
+          <div class="col-span-3">Variação / Salto (+/- cm)</div>
+          <div class="col-span-1 text-center">Ação</div>
         </div>
 
         <!-- Lista Dinâmica de Medidas -->
@@ -169,7 +177,6 @@
           <p class="text-slate-500 text-sm">Confira os valores gerados abaixo. Você pode imprimir ou exportar para PDF.</p>
         </div>
         <div class="flex flex-wrap gap-3">
-          <!-- NOVO BOTÃO: Gerar Nova Tabela sem recadastrar lead -->
           <button id="newTableBtn" class="neo-btn-secondary text-slate-700 font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-2 text-sm">
             <i class="fa-solid fa-rotate-left text-brand-orange"></i> Nova Tabela
           </button>
@@ -184,7 +191,7 @@
         </div>
       </div>
 
-      <!-- Container da Ficha de Medidas (Estilo Neomorfismo Claro para Garantir Renderização do PDF) -->
+      <!-- Container da Ficha -->
       <div id="pdfExportContainer" class="neo-card p-6 md:p-10 rounded-3xl">
         
         <!-- Header da Ficha -->

@@ -1,4 +1,4 @@
-// Webhook para armazenamento dos leads (Cole sua URL do SheetDB ou AppScript aqui)
+// Webhook SheetDB
 const WEBHOOK_URL = 'https://sheetdb.io/api/v1/upttn1y5ud4r7';
 
 let sizes = ['PP', 'P', 'M', 'G', 'GG'];
@@ -31,17 +31,19 @@ function loadDefaultMeasures() {
   addMeasureRow('Comprimento Total', 58, 1);
 }
 
-// 1. Envio do Lead
+// 1. Envio do Lead (Ajustado para o SheetDB)
 leadForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
-  // Estrutura exigida pelo SheetDB
+  const agora = new Date();
+  const dataFormatada = agora.toLocaleDateString('pt-BR') + ' ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
   const leadPayload = {
     data: {
       nome: document.getElementById('leadName').value,
       whatsapp: document.getElementById('leadPhone').value,
       email: document.getElementById('leadEmail').value,
-      data: new Date().toLocaleString('pt-BR')
+      data: "'" + dataFormatada
     }
   };
 
@@ -55,7 +57,7 @@ leadForm.addEventListener('submit', (e) => {
       body: JSON.stringify(leadPayload)
     })
     .then(response => response.json())
-    .then(data => console.log('Lead salvo com sucesso no Google Sheets:', data))
+    .then(data => console.log('Lead registrado com sucesso:', data))
     .catch(err => console.error('Erro ao registrar contato:', err));
   }
 
@@ -128,7 +130,7 @@ baseSizeSelect.addEventListener('change', (e) => {
   selectedBaseSize = e.target.value;
 });
 
-// 3. Linhas de Medidas
+// 3. Linhas de Medidas com Rótulos
 addMeasureBtn.addEventListener('click', () => addMeasureRow());
 
 function addMeasureRow(name = '', val = '', step = '') {
@@ -136,16 +138,19 @@ function addMeasureRow(name = '', val = '', step = '') {
   row.className = 'measure-row grid grid-cols-1 md:grid-cols-12 gap-3 items-center neo-card-sm p-3.5 rounded-2xl border border-white/80';
   row.innerHTML = `
     <div class="md:col-span-5">
-      <input type="text" value="${name}" placeholder="Nome da Medida (ex: Busto)" class="measure-name neo-input w-full px-3.5 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none">
+      <label class="block md:hidden text-[10px] font-bold text-slate-600 uppercase mb-1">Descrição da Medida</label>
+      <input type="text" value="${name}" placeholder="Ex: Busto, Cintura, Comprimento" class="measure-name neo-input w-full px-3.5 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none">
     </div>
     <div class="md:col-span-3">
-      <input type="number" step="0.1" value="${val}" placeholder="Valor Base (cm)" class="measure-val neo-input w-full px-3.5 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none">
+      <label class="block md:hidden text-[10px] font-bold text-slate-600 uppercase mb-1">Medida Base (cm)</label>
+      <input type="number" step="0.1" value="${val}" placeholder="Ex: 84" class="measure-val neo-input w-full px-3.5 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none">
     </div>
     <div class="md:col-span-3">
-      <input type="number" step="0.1" value="${step}" placeholder="Variação (+/- cm)" class="measure-step neo-input w-full px-3.5 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none">
+      <label class="block md:hidden text-[10px] font-bold text-slate-600 uppercase mb-1">Variação / Salto (+/- cm)</label>
+      <input type="number" step="0.1" value="${step}" placeholder="Ex: 4" class="measure-step neo-input w-full px-3.5 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none">
     </div>
-    <div class="md:col-span-1 text-right">
-      <button type="button" onclick="this.closest('.measure-row').remove()" class="text-slate-400 hover:text-rose-600 transition p-2">
+    <div class="md:col-span-1 text-right md:text-center">
+      <button type="button" onclick="this.closest('.measure-row').remove()" title="Excluir medida" class="text-slate-400 hover:text-rose-600 transition p-2">
         <i class="fa-solid fa-trash-can"></i>
       </button>
     </div>
@@ -226,7 +231,7 @@ calculateBtn.addEventListener('click', () => {
   resultSection.scrollIntoView({ behavior: 'smooth' });
 });
 
-// 5. Botão "Nova Tabela" (Reseta a calculadora mantendo o usuário logado)
+// 5. Botão "Nova Tabela"
 newTableBtn.addEventListener('click', () => {
   document.getElementById('modelRef').value = '';
   loadDefaultMeasures();

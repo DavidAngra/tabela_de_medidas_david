@@ -4,7 +4,7 @@
   background-attachment: fixed;
 }
 
-/* Cartões Principais: Cor #D4D4D4 com Sombra Projetada Limpa (Sem Blur Branco) */
+/* Cartões Principais: Cor #D4D4D4 com Sombra Projetada Limpa */
 .neo-card {
   background-color: #D4D4D4;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
