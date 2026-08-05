@@ -31,39 +31,62 @@ function loadDefaultMeasures() {
   addMeasureRow('Comprimento Total', 58, 1);
 }
 
-// 1. Envio do Lead (Ajustado para o SheetDB)
-leadForm.addEventListener('submit', (e) => {
+// 1. Envio do Lead (Verifica duplicados antes de cadastrar)
+leadForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  const nomeInput = document.getElementById('leadName').value.trim();
+  const whatsappInput = document.getElementById('leadPhone').value.trim();
+  const emailInput = document.getElementById('leadEmail').value.trim();
 
   const agora = new Date();
   const dataFormatada = agora.toLocaleDateString('pt-BR') + ' ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-  const leadPayload = {
-    data: {
-      nome: document.getElementById('leadName').value,
-      whatsapp: document.getElementById('leadPhone').value,
-      email: document.getElementById('leadEmail').value,
-      data: "'" + dataFormatada
-    }
-  };
-
-  if (WEBHOOK_URL) {
-    fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 
-        'Accept': 'application/json',
-        'Content-Type': 'application/json' 
-      },
-      body: JSON.stringify(leadPayload)
-    })
-    .then(response => response.json())
-    .then(data => console.log('Lead registrado com sucesso:', data))
-    .catch(err => console.error('Erro ao registrar contato:', err));
-  }
-
+  // 1. Libera a tela imediatamente para o usuário
   leadSection.classList.add('hidden');
   appSection.classList.remove('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // 2. Processa a verificação e o cadastro em segundo plano
+  if (WEBHOOK_URL) {
+    try {
+      // Consulta se o WhatsApp informado já existe na planilha
+      const searchUrl = `${WEBHOOK_URL}/search?whatsapp=${encodeURIComponent(whatsappInput)}`;
+      const checkResponse = await fetch(searchUrl);
+      const existingLeads = await checkResponse.json();
+
+      // Se o retorno for um array com itens, o cliente já está cadastrado
+      if (Array.isArray(existingLeads) && existingLeads.length > 0) {
+        console.log('Cliente já cadastrado na planilha. Envio duplicado ignorado.');
+        return; // Interrompe para não duplicar
+      }
+
+      // Se não existir, insere o novo lead
+      const leadPayload = {
+        data: {
+          nome: nomeInput,
+          whatsapp: whatsappInput,
+          email: emailInput,
+          data: "'" + dataFormatada
+        }
+      };
+
+      const saveResponse = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 
+          'Accept': 'application/json',
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify(leadPayload)
+      });
+
+      const result = await saveResponse.json();
+      console.log('Novo lead cadastrado com sucesso:', result);
+
+    } catch (err) {
+      console.error('Erro na verificação ou envio do lead:', err);
+    }
+  }
 });
 
 // 2. Tamanhos Dinâmicos
