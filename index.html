@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- html2pdf.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <!-- Estilos Neomórficos e Background Gradient -->
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="neo-bg text-slate-800 min-h-screen flex flex-col font-sans selection:bg-brand-orange selection:text-white">
@@ -91,7 +91,7 @@
     <!-- Área da Aplicação -->
     <div id="appSection" class="hidden space-y-8 no-print">
 
-      <!-- 1. Dados do Modelo & Tamanhos -->
+      <!-- 1. Identificação & Tamanhos -->
       <section class="neo-card p-6 md:p-8 rounded-3xl space-y-6">
         <div class="flex items-center space-x-3 border-b border-slate-300/60 pb-4">
           <span class="neo-orange-btn text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center">1</span>
@@ -99,21 +99,15 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Nome / Referência -->
           <div class="md:col-span-1">
             <label class="block text-xs uppercase tracking-wider font-bold text-slate-600 mb-2">Modelo / Referência *</label>
             <input type="text" id="modelRef" placeholder="Ex: Scrub Pollo" class="neo-input w-full px-4 py-3 text-brand-black placeholder-slate-400 focus:outline-none transition">
           </div>
 
-          <!-- Gerenciador de Tamanhos -->
           <div class="md:col-span-2 space-y-2">
             <label class="block text-xs uppercase tracking-wider font-bold text-slate-600 mb-1">Tamanhos da Tabela</label>
-            
-            <div class="flex flex-wrap gap-2.5 items-center mb-3" id="sizeBadgesContainer">
-              <!-- Renderizado via JS -->
-            </div>
+            <div class="flex flex-wrap gap-2.5 items-center mb-3" id="sizeBadgesContainer"></div>
 
-            <!-- Adicionar Novo Tamanho -->
             <div class="flex gap-2">
               <input type="text" id="newSizeInput" placeholder="Adicionar tamanho (ex: GGG, 42)" class="neo-input px-4 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none flex-grow">
               <button type="button" id="addSizeBtn" class="neo-btn-dark text-white font-medium px-4 py-2 rounded-xl text-sm transition">
@@ -123,19 +117,17 @@
           </div>
         </div>
 
-        <!-- Seleção do Tamanho Base -->
         <div class="pt-4 border-t border-slate-300/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <label class="block text-sm font-bold text-brand-black">Qual é o seu Tamanho Base (Piloto)?</label>
             <p class="text-xs text-slate-500">Os aumentos e diminuições serão calculados a partir deste tamanho.</p>
           </div>
           <select id="baseSizeSelect" class="neo-input text-brand-orange font-bold rounded-xl px-4 py-2.5 focus:outline-none min-w-[150px]">
-            <!-- Preenchido via JS -->
           </select>
         </div>
       </section>
 
-      <!-- 2. Medidas Base & Aumento/Diminuição -->
+      <!-- 2. Medidas Base & Salto de Gradação -->
       <section class="neo-card p-6 md:p-8 rounded-3xl space-y-4">
         <div class="flex justify-between items-center border-b border-slate-300/60 pb-4">
           <div class="flex items-center space-x-3">
@@ -147,21 +139,18 @@
           </button>
         </div>
 
-        <!-- Legenda Fixa das Colunas (Desktop) -->
+        <!-- Cabeçalho Informativo -->
         <div class="hidden md:grid grid-cols-12 gap-3 px-3 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-          <div class="col-span-5">Descrição da Medida</div>
-          <div class="col-span-3">Medida Base (cm)</div>
-          <div class="col-span-3">Variação / Salto (+/- cm)</div>
+          <div class="col-span-4">Descrição da Medida</div>
+          <div class="col-span-2">Medida Base (cm)</div>
+          <div class="col-span-5">Gradação / Variação</div>
           <div class="col-span-1 text-center">Ação</div>
         </div>
 
         <!-- Lista Dinâmica de Medidas -->
-        <div id="measuresContainer" class="space-y-3.5">
-          <!-- Linhas de medida via JS -->
-        </div>
+        <div id="measuresContainer" class="space-y-3.5"></div>
       </section>
 
-      <!-- Botão Calcular -->
       <div class="text-center">
         <button id="calculateBtn" class="neo-btn-primary text-white font-bold text-lg px-10 py-4 rounded-2xl transition transform active:scale-95">
           <i class="fa-solid fa-calculator mr-2"></i> Calcular e Gerar Tabela
@@ -191,10 +180,7 @@
         </div>
       </div>
 
-      <!-- Container da Ficha -->
       <div id="pdfExportContainer" class="neo-card p-6 md:p-10 rounded-3xl">
-        
-        <!-- Header da Ficha -->
         <div class="border-b border-slate-200 pb-6 mb-6 flex justify-between items-end">
           <div>
             <span class="text-xs uppercase font-bold text-brand-orange tracking-widest block mb-1">Ficha de Gradação de Medidas</span>
@@ -206,7 +192,6 @@
           </div>
         </div>
 
-        <!-- Tabela -->
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
@@ -216,7 +201,6 @@
           </table>
         </div>
 
-        <!-- Rodapé do PDF -->
         <div class="mt-8 pt-4 border-t border-slate-200/80 text-center text-xs text-slate-400">
           <p>Tabela de medidas gerada via GraduaPro - David Carvalho Modelista & Risco Computadorizado</p>
         </div>
@@ -225,7 +209,6 @@
 
   </main>
 
-  <!-- Rodapé Institucional -->
   <footer class="border-t border-white/50 py-6 text-center text-xs text-slate-500 no-print mt-auto">
     <div class="max-w-5xl mx-auto px-4 space-y-1">
       <p>Desenvolvido para profissionais da confecção e vestuário.</p>

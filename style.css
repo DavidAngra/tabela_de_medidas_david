@@ -1,24 +1,23 @@
-/* Fundo da Tela: Degradê Diagonal entre #C3C1C2 e #C3B6AE */
+/* Fundo da Tela: Degradê Diagonal */
 .neo-bg {
   background: linear-gradient(135deg, #C3C1C2 0%, #C3B6AE 100%);
   background-attachment: fixed;
 }
 
-/* Cartões Principais: Cor #D4D4D4 com Sombra Projetada Limpa */
+/* Cartões Principais */
 .neo-card {
   background-color: #D4D4D4;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Cartões Menores e Elementos em Destaque */
 .neo-card-sm {
   background-color: #D4D4D4;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Campos de Entrada (Inputs Mais Claros e Agradáveis) */
+/* Inputs */
 .neo-input {
   background-color: #F2F2F4;
   color: #1E1E24;
@@ -37,7 +36,7 @@
     inset 2px 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Botões Principais Laranja com Sombra Limpa */
+/* Botões */
 .neo-btn-primary {
   background: linear-gradient(145deg, #FF851A, #E56D00);
   box-shadow: 0 8px 20px rgba(229, 109, 0, 0.35);
