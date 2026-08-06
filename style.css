@@ -1,4 +1,4 @@
-/* Fundo da Tela: Degradê Diagonal */
+/* Fundo da Tela */
 .neo-bg {
   background: linear-gradient(135deg, #C3C1C2 0%, #C3B6AE 100%);
   background-attachment: fixed;

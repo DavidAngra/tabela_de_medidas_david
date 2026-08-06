@@ -3,6 +3,7 @@ const WEBHOOK_URL = 'https://sheetdb.io/api/v1/upttn1y5ud4r7';
 
 let sizes = ['PP', 'P', 'M', 'G', 'GG'];
 let selectedBaseSize = 'M';
+let tableBlockCounter = 0;
 
 // Referências DOM
 const leadForm = document.getElementById('leadForm');
@@ -12,23 +13,32 @@ const sizeBadgesContainer = document.getElementById('sizeBadgesContainer');
 const newSizeInput = document.getElementById('newSizeInput');
 const addSizeBtn = document.getElementById('addSizeBtn');
 const baseSizeSelect = document.getElementById('baseSizeSelect');
-const measuresContainer = document.getElementById('measuresContainer');
-const addMeasureBtn = document.getElementById('addMeasureBtn');
+const addNewTableBlockBtn = document.getElementById('addNewTableBlockBtn');
+const tableBlocksContainer = document.getElementById('tableBlocksContainer');
 const calculateBtn = document.getElementById('calculateBtn');
 const resultSection = document.getElementById('resultSection');
-const newTableBtn = document.getElementById('newTableBtn');
+const resetFormBtn = document.getElementById('resetFormBtn');
+const tablesOutputContainer = document.getElementById('tablesOutputContainer');
 
 document.addEventListener('DOMContentLoaded', () => {
   renderSizeBadges();
-  loadDefaultMeasures();
+  initDefaultTableBlocks();
 });
 
-function loadDefaultMeasures() {
-  measuresContainer.innerHTML = '';
-  addMeasureRow('Busto / Tórax', 84, 4);
-  addMeasureRow('Cintura', 66, 4);
-  addMeasureRow('Quadril', 92, 4);
-  addMeasureRow('Comprimento Total', 58, 1);
+function initDefaultTableBlocks() {
+  tableBlocksContainer.innerHTML = '';
+  tableBlockCounter = 0;
+
+  // Cria o primeiro Bloco (Ex: Parte Superior / Blusa)
+  const block1 = addTableBlock('Parte Superior (Blusa)');
+  addMeasureToBlock(block1, 'Busto / Tórax', 84, 4);
+  addMeasureToBlock(block1, 'Comprimento Blusa', 58, 1);
+
+  // Cria o segundo Bloco (Ex: Parte Inferior / Calça)
+  const block2 = addTableBlock('Parte Inferior (Calça)');
+  addMeasureToBlock(block2, 'Cintura', 66, 4);
+  addMeasureToBlock(block2, 'Quadril', 92, 4);
+  addMeasureToBlock(block2, 'Comprimento Calça', 100, 1.5);
 }
 
 // 1. Envio do Lead
@@ -53,7 +63,7 @@ leadForm.addEventListener('submit', async (e) => {
       const existingLeads = await checkResponse.json();
 
       if (Array.isArray(existingLeads) && existingLeads.length > 0) {
-        console.log('Cliente já cadastrado. Envio duplicado ignorado.');
+        console.log('Cliente já cadastrado. Envio ignorado.');
         return;
       }
 
@@ -146,82 +156,130 @@ baseSizeSelect.addEventListener('change', (e) => {
   selectedBaseSize = e.target.value;
 });
 
-// 3. Linhas de Medidas com Alternância de Modo (Uniforme / Personalizado)
-addMeasureBtn.addEventListener('click', () => addMeasureRow());
+// 3. Gerenciamento Modular de Blocos de Tabelas (Ex: Blusa, Calça, etc.)
+addNewTableBlockBtn.addEventListener('click', () => {
+  addTableBlock();
+});
 
-function addMeasureRow(name = '', val = '', step = '') {
+function addTableBlock(title = '') {
+  tableBlockCounter++;
+  const blockId = `table-block-${tableBlockCounter}`;
+  
+  const block = document.createElement('div');
+  block.className = 'table-block neo-card p-5 md:p-8 rounded-2xl md:rounded-3xl space-y-4';
+  block.id = blockId;
+
+  const defaultTitle = title || `Tabela ${tableBlockCounter} (ex: Vestido, Saia)`;
+
+  block.innerHTML = `
+    <!-- Header da Tabela -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-300/60 pb-4">
+      <div class="flex items-center space-x-3 flex-grow">
+        <span class="neo-orange-btn text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-table"></i>
+        </span>
+        <input type="text" value="${defaultTitle}" placeholder="Nome do Bloco (ex: Blusa, Calça, Saia)" class="table-title-input neo-input font-bold text-base md:text-lg text-brand-black px-3 py-1.5 w-full focus:outline-none">
+      </div>
+      <div class="flex items-center gap-2 justify-end shrink-0">
+        <button type="button" class="add-measure-btn neo-btn-secondary text-brand-orange font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1.5">
+          <i class="fa-solid fa-plus"></i> Nova Medida
+        </button>
+        <button type="button" class="remove-block-btn text-slate-400 hover:text-rose-600 transition p-2" title="Excluir esta Tabela">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Container das Medidas deste Bloco -->
+    <div class="block-measures-container space-y-3"></div>
+  `;
+
+  // Evento para adicionar medida no bloco específico
+  block.querySelector('.add-measure-btn').addEventListener('click', () => {
+    addMeasureToBlock(block);
+  });
+
+  // Evento para excluir o bloco inteiro
+  block.querySelector('.remove-block-btn').addEventListener('click', () => {
+    if (document.querySelectorAll('.table-block').length <= 1) {
+      alert('Seu projeto precisa ter pelo menos uma tabela.');
+      return;
+    }
+    block.remove();
+  });
+
+  tableBlocksContainer.appendChild(block);
+  return block;
+}
+
+// Adiciona uma linha de medida dentro de um Bloco de Tabela específico
+function addMeasureToBlock(blockElement, name = '', val = '', step = '') {
+  const container = blockElement.querySelector('.block-measures-container');
   const row = document.createElement('div');
   row.className = 'measure-row grid grid-cols-1 md:grid-cols-12 gap-3 items-start neo-card-sm p-3.5 rounded-2xl border border-white/80';
-  row.dataset.mode = 'uniform'; // 'uniform' ou 'custom'
+  row.dataset.mode = 'uniform';
 
   row.innerHTML = `
-    <!-- Descrição -->
+    <!-- Nome da Medida -->
     <div class="md:col-span-4">
-      <label class="block md:hidden text-[10px] font-bold text-slate-600 uppercase mb-1">Descrição da Medida</label>
-      <input type="text" value="${name}" placeholder="Ex: Busto, Cintura" class="measure-name neo-input w-full px-3.5 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none">
+      <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Nome da Medida</label>
+      <input type="text" value="${name}" placeholder="Ex: Busto, Cintura, Comprimento" class="measure-name neo-input w-full px-3.5 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none">
     </div>
 
     <!-- Valor Base -->
-    <div class="md:col-span-2">
-      <label class="block md:hidden text-[10px] font-bold text-slate-600 uppercase mb-1">Medida Base (cm)</label>
+    <div class="md:col-span-3">
+      <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Medida Base (cm)</label>
       <input type="number" step="0.1" value="${val}" placeholder="Ex: 84" class="measure-val neo-input w-full px-3.5 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none">
     </div>
 
-    <!-- Seção de Salto / Variação -->
-    <div class="md:col-span-5 space-y-2">
+    <!-- Salto de Gradação -->
+    <div class="md:col-span-4 space-y-1.5">
       <div class="flex items-center justify-between">
-        <label class="block text-[10px] font-bold text-slate-600 uppercase">Tipo de Salto</label>
-        <button type="button" class="toggle-mode-btn text-[11px] font-bold text-brand-orange hover:underline focus:outline-none">
-          <i class="fa-solid fa-sliders mr-1"></i> <span class="mode-label-text">Alternar p/ Por Tamanho</span>
+        <label class="block text-[10px] font-bold text-slate-600 uppercase">Salto de Gradação</label>
+        <button type="button" class="toggle-mode-btn text-[10px] font-bold text-brand-orange hover:underline focus:outline-none">
+          <span class="mode-label-text">Por Tamanho</span>
         </button>
       </div>
 
-      <!-- Container Uniforme -->
       <div class="uniform-step-container">
-        <input type="number" step="0.1" value="${step}" placeholder="Aumento único p/ todos (cm)" class="measure-step neo-input w-full px-3.5 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none">
+        <input type="number" step="0.1" value="${step}" placeholder="Aumento único (cm)" class="measure-step neo-input w-full px-3.5 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none">
       </div>
 
-      <!-- Container Personalizado por Tamanho -->
-      <div class="custom-step-container hidden grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
-        <!-- Renderizado dinamicamente via JS -->
-      </div>
+      <div class="custom-step-container hidden grid grid-cols-2 gap-1.5 pt-1"></div>
     </div>
 
-    <!-- Ação Excluir -->
-    <div class="md:col-span-1 text-right md:text-center pt-2 md:pt-0">
-      <button type="button" onclick="this.closest('.measure-row').remove()" title="Excluir medida" class="text-slate-400 hover:text-rose-600 transition p-2">
+    <!-- Excluir Medida -->
+    <div class="md:col-span-1 text-right md:text-center pt-2 md:pt-6">
+      <button type="button" onclick="this.closest('.measure-row').remove()" title="Excluir medida" class="text-slate-400 hover:text-rose-600 transition p-1.5">
         <i class="fa-solid fa-trash-can"></i>
       </button>
     </div>
   `;
 
-  // Configura botão de alternar modo
   const toggleBtn = row.querySelector('.toggle-mode-btn');
   toggleBtn.addEventListener('click', () => {
     if (row.dataset.mode === 'uniform') {
       row.dataset.mode = 'custom';
-      toggleBtn.querySelector('.mode-label-text').textContent = 'Alternar p/ Salto Único';
+      toggleBtn.querySelector('.mode-label-text').textContent = 'Salto Único';
       row.querySelector('.uniform-step-container').classList.add('hidden');
       row.querySelector('.custom-step-container').classList.remove('hidden');
       buildCustomStepInputs(row);
     } else {
       row.dataset.mode = 'uniform';
-      toggleBtn.querySelector('.mode-label-text').textContent = 'Alternar p/ Por Tamanho';
+      toggleBtn.querySelector('.mode-label-text').textContent = 'Por Tamanho';
       row.querySelector('.uniform-step-container').classList.remove('hidden');
       row.querySelector('.custom-step-container').classList.add('hidden');
     }
   });
 
-  measuresContainer.appendChild(row);
+  container.appendChild(row);
   buildCustomStepInputs(row, step);
 }
 
-// Constrói os campos de entrada de salto individual entre os tamanhos
 function buildCustomStepInputs(row, defaultStep = '') {
   const customContainer = row.querySelector('.custom-step-container');
   const existingValues = {};
 
-  // Preserva valores digitados previamente
   customContainer.querySelectorAll('.custom-step-input').forEach(inp => {
     existingValues[inp.dataset.interval] = inp.value;
   });
@@ -237,20 +295,18 @@ function buildCustomStepInputs(row, defaultStep = '') {
     const div = document.createElement('div');
     div.className = 'flex flex-col';
     div.innerHTML = `
-      <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tight">${fromSize} ➔ ${toSize}</span>
-      <input type="number" step="0.1" value="${val}" data-interval="${key}" data-from="${fromSize}" data-to="${toSize}" placeholder="cm" class="custom-step-input neo-input px-2 py-1 text-xs text-brand-black placeholder-slate-400 focus:outline-none">
+      <span class="text-[8px] font-bold text-slate-500 uppercase">${fromSize}➔${toSize}</span>
+      <input type="number" step="0.1" value="${val}" data-interval="${key}" placeholder="cm" class="custom-step-input neo-input px-2 py-1 text-xs text-brand-black focus:outline-none">
     `;
     customContainer.appendChild(div);
   }
 }
 
 function rebuildAllCustomStepInputs() {
-  document.querySelectorAll('.measure-row').forEach(row => {
-    buildCustomStepInputs(row);
-  });
+  document.querySelectorAll('.measure-row').forEach(row => buildCustomStepInputs(row));
 }
 
-// 4. Gerar Tabela (Calcula salto uniforme ou variação individual por tamanho)
+// 4. Calcular e Gerar Documento Completo com Todos os Blocos
 calculateBtn.addEventListener('click', () => {
   const modelRefText = document.getElementById('modelRef').value.trim();
   if (!modelRefText) {
@@ -265,65 +321,93 @@ calculateBtn.addEventListener('click', () => {
     return;
   }
 
-  const rows = document.querySelectorAll('.measure-row');
-  const measures = [];
+  const blockElements = document.querySelectorAll('.table-block');
+  const compiledData = [];
 
-  rows.forEach(row => {
-    const name = row.querySelector('.measure-name').value.trim();
-    const value = parseFloat(row.querySelector('.measure-val').value);
-    const mode = row.dataset.mode;
+  blockElements.forEach(block => {
+    const title = block.querySelector('.table-title-input').value.trim() || 'Tabela de Medidas';
+    const rows = block.querySelectorAll('.measure-row');
+    const measures = [];
 
-    if (!name || isNaN(value)) return;
+    rows.forEach(row => {
+      const name = row.querySelector('.measure-name').value.trim();
+      const value = parseFloat(row.querySelector('.measure-val').value);
+      const mode = row.dataset.mode;
 
-    if (mode === 'uniform') {
-      const step = parseFloat(row.querySelector('.measure-step').value);
-      if (!isNaN(step)) {
-        measures.push({ name, value, mode: 'uniform', step });
+      if (!name || isNaN(value)) return;
+
+      if (mode === 'uniform') {
+        const step = parseFloat(row.querySelector('.measure-step').value);
+        if (!isNaN(step)) {
+          measures.push({ name, value, mode: 'uniform', step });
+        }
+      } else {
+        const steps = {};
+        let valid = true;
+        row.querySelectorAll('.custom-step-input').forEach(inp => {
+          const intervalKey = inp.dataset.interval;
+          const stepVal = parseFloat(inp.value);
+          if (isNaN(stepVal)) valid = false;
+          steps[intervalKey] = stepVal;
+        });
+
+        if (valid) {
+          measures.push({ name, value, mode: 'custom', steps });
+        }
       }
-    } else {
-      // Coleta os saltos individuais de cada intervalo entre tamanhos
-      const steps = {};
-      let valid = true;
-      row.querySelectorAll('.custom-step-input').forEach(inp => {
-        const intervalKey = inp.dataset.interval;
-        const stepVal = parseFloat(inp.value);
-        if (isNaN(stepVal)) valid = false;
-        steps[intervalKey] = stepVal;
-      });
+    });
 
-      if (valid) {
-        measures.push({ name, value, mode: 'custom', steps });
-      }
+    if (measures.length > 0) {
+      compiledData.push({ title, measures });
     }
   });
 
-  if (measures.length === 0) {
-    alert('Preencha os valores de medida e variação corretamente.');
+  if (compiledData.length === 0) {
+    alert('Preencha os valores de medida e variação corretamente em pelo menos uma tabela.');
     return;
   }
 
   document.getElementById('pdfModelRef').textContent = modelRefText;
   document.getElementById('pdfDate').textContent = new Date().toLocaleDateString('pt-BR');
 
-  // Cabeçalho da Tabela
-  const header = document.getElementById('tableHeader');
-  header.innerHTML = `<th class="p-4 border-b-2 border-slate-800 text-slate-800 font-bold">Medida (cm)</th>` +
-    sizes.map(s => `
-      <th class="p-4 border-b-2 border-slate-800 text-center ${s === selectedBaseSize ? 'text-brand-orange font-extrabold bg-orange-100/50' : 'text-slate-800 font-bold'}">
-        ${s} ${s === selectedBaseSize ? '<span class="text-[10px] block font-semibold text-brand-orange">(BASE)</span>' : ''}
-      </th>
-    `).join('');
+  tablesOutputContainer.innerHTML = '';
 
-  // Corpo da Tabela
-  const body = document.getElementById('tableBody');
-  body.innerHTML = '';
+  compiledData.forEach(blockData => {
+    tablesOutputContainer.appendChild(renderSingleTable(blockData.title, blockData.measures, baseIndex));
+  });
+
+  resultSection.classList.remove('hidden');
+  resultSection.scrollIntoView({ behavior: 'smooth' });
+});
+
+// Renderiza uma tabela estilizada na ficha final
+function renderSingleTable(title, measures, baseIndex) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'space-y-3';
+
+  let tableHtml = `
+    <div class="flex items-center gap-2 border-b border-brand-orange/40 pb-2">
+      <i class="fa-solid fa-scissors text-brand-orange text-sm"></i>
+      <h4 class="font-extrabold text-sm md:text-base text-brand-black uppercase tracking-wide">${title}</h4>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b-2 border-slate-800 text-slate-700 text-xs uppercase tracking-wider bg-slate-100/50">
+            <th class="p-3 md:p-4 border-b-2 border-slate-800 font-bold">Medida (cm)</th>
+            ${sizes.map(s => `
+              <th class="p-3 md:p-4 border-b-2 border-slate-800 text-center ${s === selectedBaseSize ? 'text-brand-orange font-extrabold bg-orange-100/50' : 'text-slate-800 font-bold'}">
+                ${s} ${s === selectedBaseSize ? '<span class="text-[9px] block font-semibold text-brand-orange">(BASE)</span>' : ''}
+              </th>
+            `).join('')}
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200/80 text-slate-800 text-xs md:text-sm">
+  `;
 
   measures.forEach(m => {
-    let tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-100/50 transition';
-    let html = `<td class="p-4 font-bold text-slate-900 border-b border-slate-200/80">${m.name}</td>`;
+    tableHtml += `<tr class="hover:bg-slate-100/50 transition"><td class="p-3 md:p-4 font-bold text-slate-900 border-b border-slate-200/80">${m.name}</td>`;
 
-    // Calcula os valores de cada tamanho com base na regra selecionada
     sizes.forEach((size, idx) => {
       let calcValue = m.value;
 
@@ -331,7 +415,6 @@ calculateBtn.addEventListener('click', () => {
         const multiplier = idx - baseIndex;
         calcValue = m.value + (multiplier * m.step);
       } else {
-        // Cálculo acumulativo para o modo personalizado por tamanho
         if (idx > baseIndex) {
           for (let i = baseIndex; i < idx; i++) {
             const key = `${sizes[i]}_${sizes[i + 1]}`;
@@ -346,33 +429,36 @@ calculateBtn.addEventListener('click', () => {
       }
 
       const isBase = size === selectedBaseSize;
-      html += `
-        <td class="p-4 text-center border-b border-slate-200/80 ${isBase ? 'bg-orange-50 font-extrabold text-brand-orange' : 'font-medium text-slate-700'}">
+      tableHtml += `
+        <td class="p-3 md:p-4 text-center border-b border-slate-200/80 ${isBase ? 'bg-orange-50 font-extrabold text-brand-orange' : 'font-medium text-slate-700'}">
           ${calcValue.toFixed(1)}
         </td>
       `;
     });
 
-    tr.innerHTML = html;
-    body.appendChild(tr);
+    tableHtml += `</tr>`;
   });
 
-  resultSection.classList.remove('hidden');
-  resultSection.scrollIntoView({ behavior: 'smooth' });
-});
+  tableHtml += `
+        </tbody>
+      </table>
+    </div>
+  `;
 
-// 5. Botão "Nova Tabela"
-newTableBtn.addEventListener('click', () => {
+  wrapper.innerHTML = tableHtml;
+  return wrapper;
+}
+
+// 5. Botão "Novo Projeto"
+resetFormBtn.addEventListener('click', () => {
   document.getElementById('modelRef').value = '';
-  loadDefaultMeasures();
+  initDefaultTableBlocks();
   resultSection.classList.add('hidden');
   appSection.scrollIntoView({ behavior: 'smooth' });
 });
 
 // 6. Impressão e PDF
-document.getElementById('printBtn').addEventListener('click', () => {
-  window.print();
-});
+document.getElementById('printBtn').addEventListener('click', () => window.print());
 
 document.getElementById('pdfBtn').addEventListener('click', () => {
   const element = document.getElementById('pdfExportContainer');
