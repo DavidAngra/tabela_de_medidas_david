@@ -20,28 +20,46 @@ const resultSection = document.getElementById('resultSection');
 const resetFormBtn = document.getElementById('resetFormBtn');
 const tablesOutputContainer = document.getElementById('tablesOutputContainer');
 
+// Referências Modal de Guia
+const guideModal = document.getElementById('guideModal');
+const closeGuideBtn = document.getElementById('closeGuideBtn');
+const closeGuideModalIcon = document.getElementById('closeGuideModalIcon');
+const openGuideBtn = document.getElementById('openGuideBtn');
+
 document.addEventListener('DOMContentLoaded', () => {
   renderSizeBadges();
   initDefaultTableBlocks();
+  setupGuideModalEvents();
 });
+
+function setupGuideModalEvents() {
+  const closeModal = () => guideModal.classList.add('hidden');
+  const openModal = () => guideModal.classList.remove('hidden');
+
+  closeGuideBtn.addEventListener('click', closeModal);
+  closeGuideModalIcon.addEventListener('click', closeModal);
+  openGuideBtn.addEventListener('click', openModal);
+
+  guideModal.addEventListener('click', (e) => {
+    if (e.target === guideModal) closeModal();
+  });
+}
 
 function initDefaultTableBlocks() {
   tableBlocksContainer.innerHTML = '';
   tableBlockCounter = 0;
 
-  // Cria o primeiro Bloco (Ex: Parte Superior / Blusa)
   const block1 = addTableBlock('Parte Superior (Blusa)');
   addMeasureToBlock(block1, 'Busto / Tórax', 84, 4);
   addMeasureToBlock(block1, 'Comprimento Blusa', 58, 1);
 
-  // Cria o segundo Bloco (Ex: Parte Inferior / Calça)
   const block2 = addTableBlock('Parte Inferior (Calça)');
   addMeasureToBlock(block2, 'Cintura', 66, 4);
   addMeasureToBlock(block2, 'Quadril', 92, 4);
   addMeasureToBlock(block2, 'Comprimento Calça', 100, 1.5);
 }
 
-// 1. Envio do Lead
+// 1. Envio do Lead & Abertura do Guia
 leadForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -54,6 +72,7 @@ leadForm.addEventListener('submit', async (e) => {
 
   leadSection.classList.add('hidden');
   appSection.classList.remove('hidden');
+  guideModal.classList.remove('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (WEBHOOK_URL) {
@@ -156,7 +175,7 @@ baseSizeSelect.addEventListener('change', (e) => {
   selectedBaseSize = e.target.value;
 });
 
-// 3. Gerenciamento Modular de Blocos de Tabelas (Ex: Blusa, Calça, etc.)
+// 3. Estrutura Modular de Tabelas
 addNewTableBlockBtn.addEventListener('click', () => {
   addTableBlock();
 });
@@ -169,16 +188,15 @@ function addTableBlock(title = '') {
   block.className = 'table-block neo-card p-5 md:p-8 rounded-2xl md:rounded-3xl space-y-4';
   block.id = blockId;
 
-  const defaultTitle = title || `Tabela ${tableBlockCounter} (ex: Vestido, Saia)`;
+  const defaultTitle = title || `Tabela ${tableBlockCounter} (ex: Cropped, Saia)`;
 
   block.innerHTML = `
-    <!-- Header da Tabela -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-300/60 pb-4">
       <div class="flex items-center space-x-3 flex-grow">
         <span class="neo-orange-btn text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center shrink-0">
           <i class="fa-solid fa-table"></i>
         </span>
-        <input type="text" value="${defaultTitle}" placeholder="Nome do Bloco (ex: Blusa, Calça, Saia)" class="table-title-input neo-input font-bold text-base md:text-lg text-brand-black px-3 py-1.5 w-full focus:outline-none">
+        <input type="text" value="${defaultTitle}" placeholder="Nome do Bloco (ex: Blusa, Calça, Cropped)" class="table-title-input neo-input font-bold text-base md:text-lg text-brand-black px-3 py-1.5 w-full focus:outline-none">
       </div>
       <div class="flex items-center gap-2 justify-end shrink-0">
         <button type="button" class="add-measure-btn neo-btn-secondary text-brand-orange font-bold px-3 py-1.5 rounded-xl text-xs transition flex items-center gap-1.5">
@@ -190,16 +208,13 @@ function addTableBlock(title = '') {
       </div>
     </div>
 
-    <!-- Container das Medidas deste Bloco -->
     <div class="block-measures-container space-y-3"></div>
   `;
 
-  // Evento para adicionar medida no bloco específico
   block.querySelector('.add-measure-btn').addEventListener('click', () => {
     addMeasureToBlock(block);
   });
 
-  // Evento para excluir o bloco inteiro
   block.querySelector('.remove-block-btn').addEventListener('click', () => {
     if (document.querySelectorAll('.table-block').length <= 1) {
       alert('Seu projeto precisa ter pelo menos uma tabela.');
@@ -212,7 +227,6 @@ function addTableBlock(title = '') {
   return block;
 }
 
-// Adiciona uma linha de medida dentro de um Bloco de Tabela específico
 function addMeasureToBlock(blockElement, name = '', val = '', step = '') {
   const container = blockElement.querySelector('.block-measures-container');
   const row = document.createElement('div');
@@ -220,19 +234,16 @@ function addMeasureToBlock(blockElement, name = '', val = '', step = '') {
   row.dataset.mode = 'uniform';
 
   row.innerHTML = `
-    <!-- Nome da Medida -->
     <div class="md:col-span-4">
       <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Nome da Medida</label>
       <input type="text" value="${name}" placeholder="Ex: Busto, Cintura, Comprimento" class="measure-name neo-input w-full px-3.5 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none">
     </div>
 
-    <!-- Valor Base -->
     <div class="md:col-span-3">
       <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1">Medida Base (cm)</label>
       <input type="number" step="0.1" value="${val}" placeholder="Ex: 84" class="measure-val neo-input w-full px-3.5 py-2 text-sm text-brand-black placeholder-slate-400 focus:outline-none">
     </div>
 
-    <!-- Salto de Gradação -->
     <div class="md:col-span-4 space-y-1.5">
       <div class="flex items-center justify-between">
         <label class="block text-[10px] font-bold text-slate-600 uppercase">Salto de Gradação</label>
@@ -248,7 +259,6 @@ function addMeasureToBlock(blockElement, name = '', val = '', step = '') {
       <div class="custom-step-container hidden grid grid-cols-2 gap-1.5 pt-1"></div>
     </div>
 
-    <!-- Excluir Medida -->
     <div class="md:col-span-1 text-right md:text-center pt-2 md:pt-6">
       <button type="button" onclick="this.closest('.measure-row').remove()" title="Excluir medida" class="text-slate-400 hover:text-rose-600 transition p-1.5">
         <i class="fa-solid fa-trash-can"></i>
@@ -306,7 +316,7 @@ function rebuildAllCustomStepInputs() {
   document.querySelectorAll('.measure-row').forEach(row => buildCustomStepInputs(row));
 }
 
-// 4. Calcular e Gerar Documento Completo com Todos os Blocos
+// 4. Calcular e Gerar Documento Completo
 calculateBtn.addEventListener('click', () => {
   const modelRefText = document.getElementById('modelRef').value.trim();
   if (!modelRefText) {
@@ -380,10 +390,9 @@ calculateBtn.addEventListener('click', () => {
   resultSection.scrollIntoView({ behavior: 'smooth' });
 });
 
-// Renderiza uma tabela estilizada na ficha final
 function renderSingleTable(title, measures, baseIndex) {
   const wrapper = document.createElement('div');
-  wrapper.className = 'space-y-3';
+  wrapper.className = 'space-y-3 pdf-table-block'; // adicionado pdf-table-block para controlar a quebra no PDF
 
   let tableHtml = `
     <div class="flex items-center gap-2 border-b border-brand-orange/40 pb-2">
@@ -457,19 +466,26 @@ resetFormBtn.addEventListener('click', () => {
   appSection.scrollIntoView({ behavior: 'smooth' });
 });
 
-// 6. Impressão e PDF
+// 6. Impressão e PDF com Quebra Automática Multitabelas
 document.getElementById('printBtn').addEventListener('click', () => window.print());
 
 document.getElementById('pdfBtn').addEventListener('click', () => {
   const element = document.getElementById('pdfExportContainer');
   const modelName = document.getElementById('modelRef').value || 'Tabela_Medidas';
   
+  // Opções do html2pdf com suporte a múltiplas páginas e quebra limpa
   const opt = {
     margin:       [10, 10, 10, 10],
     filename:     `Tabela_${modelName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`,
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    html2canvas:  { 
+      scale: 2, 
+      useCORS: true, 
+      scrollY: 0,
+      windowHeight: element.scrollHeight
+    },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' },
+    pagebreak:    { mode: ['css', 'legacy'], avoid: '.pdf-table-block' }
   };
 
   html2pdf().set(opt).from(element).save();

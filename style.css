@@ -73,6 +73,12 @@
   box-shadow: inset 1px 1px 3px rgba(255, 122, 0, 0.1);
 }
 
+/* Classe para evitar que uma tabela seja quebrada ao meio no PDF */
+.pdf-table-block {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
 /* Regras de Impressão e PDF */
 @media print {
   body { 
@@ -94,5 +100,10 @@
   th, td { 
     border-color: #cbd5e1 !important; 
     color: #000000 !important; 
+  }
+
+  .pdf-table-block {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }
